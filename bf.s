@@ -70,7 +70,7 @@ _start:
   cmpb $93, (%r15)  /* ] */
   je .CLOSE
 
-  jmp .NEXT_INS       /* Default -- noop for unrecognized characters */
+  jmp .NEXT_INS       /* Default -- nop for unrecognized characters */
 
 
   /* > */
@@ -109,7 +109,7 @@ _start:
 
   /* , */
 .COMMA:
-  /* noop since we're already reading from stdin */
+  /* nop since we're already reading from stdin */
   jmp .NEXT_INS
 
 
