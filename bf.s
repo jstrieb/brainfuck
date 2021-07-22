@@ -51,6 +51,10 @@ _start:
   je .LEQ
   cmpb $60, (%r15)  /* < */
   je .GEQ
+  cmpb $43, (%r15)  /* + */
+  je .PLUS
+  cmpb $45, (%r15)  /* - */
+  je .MINUS
 
   /* Default -- noop for unrecognized characters */
   jmp .L3
@@ -66,6 +70,20 @@ _start:
   /* < */
 .GEQ:
   add $1, %r14
+  sub $1, %r15
+  jmp .L3
+
+
+  /* + */
+.PLUS:
+  add $1, (%r14)
+  sub $1, %r15
+  jmp .L3
+
+
+  /* - */
+.MINUS:
+  sub $1, (%r14)
   sub $1, %r15
   jmp .L3
 
