@@ -42,7 +42,7 @@ _start:
 
 
   /* If we've reached the end of the code, exit */
-.L3:
+.SWITCH:
   cmp %r15, %rsp
   je .EXIT
 
@@ -60,37 +60,41 @@ _start:
   je .DOT
   cmpb $44, (%r15)  /* , */
   je .COMMA
+  cmpb $91, (%r15)  /* [ */
+  je .OPEN
+  cmpb $93, (%r15)  /* ] */
+  je .CLOSE
 
   sub $1, %r15      /* Default -- noop for unrecognized characters */
-  jmp .L3
+  jmp .SWITCH
 
 
   /* > */
 .LEQ:
   sub $1, %r14
   sub $1, %r15
-  jmp .L3
+  jmp .SWITCH
 
 
   /* < */
 .GEQ:
   add $1, %r14
   sub $1, %r15
-  jmp .L3
+  jmp .SWITCH
 
 
   /* + */
 .PLUS:
   add $1, (%r14)
   sub $1, %r15
-  jmp .L3
+  jmp .SWITCH
 
 
   /* - */
 .MINUS:
   sub $1, (%r14)
   sub $1, %r15
-  jmp .L3
+  jmp .SWITCH
 
 
   /* . */
@@ -101,14 +105,74 @@ _start:
   mov $1, %rax    /* SYS_write == 1 */
   syscall
   sub $1, %r15
-  jmp .L3
+  jmp .SWITCH
 
 
   /* , */
 .COMMA:
   /* noop since we're already reading from stdin */
   sub $1, %r15
-  jmp .L3
+  jmp .SWITCH
+
+
+  /* [ */
+.OPEN:
+  mov $1, %rdi
+  cmpb $0, (%r14)
+  je .L4
+
+  sub $1, %r15
+  jmp .SWITCH
+
+.L4:
+  sub $1, %r15
+  cmpb $91, (%r15)  /* [ */
+  je .L5
+  cmpb $93, (%r15)  /* ] */
+  je .L6
+  jmp .L4
+
+.L5:
+  add $1, %rdi
+  jmp .L7
+.L6:
+  sub $1, %rdi
+.L7:
+  test %rdi, %rdi
+  jnz .L4
+
+  sub $1, %r15
+  jmp .SWITCH
+
+
+  /* ] */
+.CLOSE:
+  mov $-1, %rdi
+  cmpb $0, (%r14)
+  jne .L8
+
+  sub $1, %r15
+  jmp .SWITCH
+
+.L8:
+  add $1, %r15
+  cmpb $91, (%r15)  /* [ */
+  je .L9
+  cmpb $93, (%r15)  /* ] */
+  je .L10
+  jmp .L8
+
+.L9:
+  add $1, %rdi
+  jmp .L11
+.L10:
+  sub $1, %rdi
+.L11:
+  test %rdi, %rdi
+  jnz .L8
+
+  sub $1, %r15
+  jmp .SWITCH
 
 
   /* Exit with code 0 */
