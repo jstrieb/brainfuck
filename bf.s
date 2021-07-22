@@ -8,11 +8,12 @@
 _start:
   /* Make space on the stack for the program memory */
   mov %rsp, %rbp
-  sub $30000, %rsp  /* 30000 = 3750 x 8  =>  rsp is address-aligned */
+  sub $30008, %rsp  /* 30000 = 3750 x 8  =>  rsp is address-aligned */
 
 
   /* r14 holds the data pointer and r15 holds the code pointer */
   mov %rbp, %r14
+  sub $8, %r14
   lea -8(%rsp), %r15
 
 
