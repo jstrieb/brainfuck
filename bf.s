@@ -2,15 +2,14 @@
 
 _start:
   /* Make space on the stack for the program memory */
-  pushq %rbp
   movq %rsp, %rbp
-  subq $30000, %rsp
+  subq $30000, %rsp  /* 30000 = 3750 x 8  =>  rsp is address-aligned */
 
-  /* Zero out the Brainfuck program memory */
+  /* Zero out the Brainfuck program memory 8 bytes at a time */
   movq %rbp, %rdi
 .L0:
-  subq $1, %rdi
-  movb $0, (%rdi)
+  subq $8, %rdi
+  movq $0, (%rdi)
   cmpq %rdi, %rsp
   jne .L0
 
