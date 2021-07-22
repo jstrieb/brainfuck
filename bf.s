@@ -39,7 +39,12 @@ _start:
 
   test %eax, %eax
   jnz .L1
+  jmp .SWITCH
 
+
+  /* Increment thet (metaphorical) instruction pointer */
+.NEXT_INS:
+  sub $1, %r15
 
   /* If we've reached the end of the code, exit */
 .SWITCH:
@@ -65,36 +70,31 @@ _start:
   cmpb $93, (%r15)  /* ] */
   je .CLOSE
 
-  sub $1, %r15      /* Default -- noop for unrecognized characters */
-  jmp .SWITCH
+  jmp .NEXT_INS       /* Default -- noop for unrecognized characters */
 
 
   /* > */
 .LEQ:
   sub $1, %r14
-  sub $1, %r15
-  jmp .SWITCH
+  jmp .NEXT_INS
 
 
   /* < */
 .GEQ:
   add $1, %r14
-  sub $1, %r15
-  jmp .SWITCH
+  jmp .NEXT_INS
 
 
   /* + */
 .PLUS:
   add $1, (%r14)
-  sub $1, %r15
-  jmp .SWITCH
+  jmp .NEXT_INS
 
 
   /* - */
 .MINUS:
   sub $1, (%r14)
-  sub $1, %r15
-  jmp .SWITCH
+  jmp .NEXT_INS
 
 
   /* . */
@@ -104,15 +104,13 @@ _start:
   mov $1, %rdx
   mov $1, %rax    /* SYS_write == 1 */
   syscall
-  sub $1, %r15
-  jmp .SWITCH
+  jmp .NEXT_INS
 
 
   /* , */
 .COMMA:
   /* noop since we're already reading from stdin */
-  sub $1, %r15
-  jmp .SWITCH
+  jmp .NEXT_INS
 
 
   /* [ */
@@ -121,8 +119,7 @@ _start:
   cmpb $0, (%r14)
   je .L4
 
-  sub $1, %r15
-  jmp .SWITCH
+  jmp .NEXT_INS
 
 .L4:
   sub $1, %r15
@@ -141,8 +138,7 @@ _start:
   test %rdi, %rdi
   jnz .L4
 
-  sub $1, %r15
-  jmp .SWITCH
+  jmp .NEXT_INS
 
 
   /* ] */
@@ -151,8 +147,7 @@ _start:
   cmpb $0, (%r14)
   jne .L8
 
-  sub $1, %r15
-  jmp .SWITCH
+  jmp .NEXT_INS
 
 .L8:
   add $1, %r15
@@ -171,8 +166,7 @@ _start:
   test %rdi, %rdi
   jnz .L8
 
-  sub $1, %r15
-  jmp .SWITCH
+  jmp .NEXT_INS
 
 
   /* Exit with code 0 */
