@@ -56,8 +56,12 @@ _start:
   je .PLUS
   cmpb $45, (%r15)  /* - */
   je .MINUS
+  cmpb $46, (%r15)  /* . */
+  je .DOT
+  cmpb $44, (%r15)  /* , */
+  je .COMMA
 
-  /* Default -- noop for unrecognized characters */
+  sub $1, %r15      /* Default -- noop for unrecognized characters */
   jmp .L3
 
 
@@ -85,6 +89,24 @@ _start:
   /* - */
 .MINUS:
   sub $1, (%r14)
+  sub $1, %r15
+  jmp .L3
+
+
+  /* . */
+.DOT:
+  mov $1, %rdi    /* stdout is file descriptor 1 */
+  mov %r14, %rsi
+  mov $1, %rdx
+  mov $1, %rax    /* SYS_write == 1 */
+  syscall
+  sub $1, %r15
+  jmp .L3
+
+
+  /* , */
+.COMMA:
+  /* noop since we're already reading from stdin */
   sub $1, %r15
   jmp .L3
 
