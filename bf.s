@@ -87,13 +87,13 @@ _start:
 
   /* + */
 .PLUS:
-  add $1, (%r14)
+  addb $1, (%r14)
   jmp .NEXT_INS
 
 
   /* - */
 .MINUS:
-  sub $1, (%r14)
+  subb $1, (%r14)
   jmp .NEXT_INS
 
 
